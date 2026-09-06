@@ -1,0 +1,214 @@
+1. Title of Database: Open University Learning Analytics dataset
+
+2. Sources:
+
+   (a) Original owners of database:
+  The Open University
+  Walton Hall, Milton Keynes
+  MK7 6AA
+  United Kingdom
+  contact: Zdenek Zdrahal (zdenek.zdrahal@open.ac.uk)
+
+   (b) Donor of database:
+  Jakub Kuzilek (jakub.kuzilek@gmail.com)
+  Knowledge Media Institute, The Open University
+  Walton Hall, Milton Keynes, MK7 6AA, UK
+  CIIRC, CTU in Prague
+  Zikova 1903/4, Prague, CZ
+  Martin Hlosta (martin.hlosta@open.ac.uk)
+  Knowledge Media Institute, The Open University
+  Walton Hall, Milton Keynes, MK7 6AA, UK
+  Zdenek Zdrahal (zdenek.zdrahal@open.ac.uk)
+  Knowledge Media Institute, The Open University
+  Walton Hall, Milton Keynes, MK7 6AA, UK
+  CIIRC, CTU in Prague
+  Zikova 1903/4, Prague, CZ
+
+   (c) Date received: December 2015
+
+
+3. Past Usage:
+  - none -
+
+4. Relevant Information Paragraph:
+
+    Open University Learning Analytics Dataset (OULAD) contains data about 
+    courses, students and their interactions with Virtual Learning 
+    Environment (VLE) for seven selected courses (called modules). Presentations
+    of courses start in February and October - they are marked by "B" and "J" 
+    respectively. The dataset consists of tables connected using unique 
+    identifiers. Dataset is stored in several csv files.  
+    
+    More information, examples and news can be found at: 
+      https://analyse.kmi.open.ac.uk/open_dataset
+
+5. Number of Instances: 
+    - students in courses: 32953
+    - course-presentations: 22
+    - VLE pages: 6364
+    - VLE log entries: 10655280
+    - registration entries: 32953
+    - assessments: 206
+    - assessment entries: 173912
+
+
+6. Number of Attributes: 43
+
+
+7. Attribute information:
+   Name		              Data Type	  Meas.	 Description
+	 ----                 ---------   -----  -------------------------------------
+   -----------------------------------------------------------------------------
+   courses.csv
+   -----------------------------------------------------------------------------
+   code_module          nominal            code name of the module, which serves 
+                                           as the identifier
+   code_presentation    nominal            code name of the presentation. It 
+                                           consists of the year and �B� for the 
+                                           presentation starting in February and 
+                                           �J� for the presentation starting 
+                                           in October
+   length               integer     days   length of the module-presentation 
+                                           in days
+   -----------------------------------------------------------------------------                                      
+   assessments.csv
+   -----------------------------------------------------------------------------
+   code_module          nominal            identification code of the module, 
+                                           to which the assessment belongs
+   code_presentation    nominal            identification code of the 
+                                           presentation, to which the assessment 
+                                           belongs
+   id_assessment        integer            identification number of the 
+                                           assessment
+   assessment_type      nominal            type of assessment
+   date                 integer     days   information about the final 
+                                           submission date of the assessment 
+                                           calculated as the number of days 
+                                           since the start of the 
+                                           module-presentation. The starting 
+                                           date of the presentation has 
+                                           number 0 (zero)
+   weight               integer    %       weight of the assessment in %. 
+                                           Typically, Exams are treated separa-
+                                           tely and have the weight 100%; 
+                                           the sum of all other assessments 
+                                           is 100%
+   -----------------------------------------------------------------------------                                      
+   vle.csv
+   -----------------------------------------------------------------------------
+   id_site              integer            an identification number 
+                                           of the material
+   code_module          nominal            an identification code for module
+   code_presentation    nominal            the identification code of presenta-
+                                           tion
+   activity_type        nominal            the role associated with the module 
+                                           material
+   week_from            integer    week    the week from which the material 
+                                           is planned to be used
+   week_to              integer    week    week until which the material is 
+                                           planned to be used
+   -----------------------------------------------------------------------------
+   studentInfo.csv
+   -----------------------------------------------------------------------------
+   code_module          nominal            an identification code for a module 
+                                           on which the student is registered
+   code_presentation    nominal            the identification code of the 
+                                           presentation during which the student 
+                                           is registered on the module
+   id_student           integer            a unique identification number 
+                                           for the student
+   gender               nominal            the student�s gender
+   region               nominal            identifies the geographic region, 
+                                           where the student lived while taking 
+                                           the module-presentation
+   highest_education    nominal            highest student education level 
+                                           on entry to the module presentation
+   imd_band             nominal            specifies the Index of Multiple 
+                                           Depravation band of the place where 
+                                           the student lived during 
+                                           the module-presentation
+   age_band             nominal            band of the student�s age
+   num_of_prev_attempts integer            the number times the student has 
+                                           attempted this module
+   studied_credits      integer            the total number of credits for the 
+                                           modules the student is currently 
+                                           studying
+   disability           nominal            indicates whether the student has 
+                                           declared a disability
+   final_result         nominal            student�s final result in the 
+                                           module-presentation
+   -----------------------------------------------------------------------------                                        
+   studentRegistration.csv
+   -----------------------------------------------------------------------------
+   code_module          nominal            an identification code for a module
+   code_presentation    nominal            the identification code 
+                                           of the presentation
+   id_student           integer            a unique identification number 
+                                           for the student
+   date_registration    integer    days    the date of student�s registration on
+                                           the module presentation, this is the 
+                                           number of days measured relative to 
+                                           the start of the module-presentation 
+                                           (e.g. the negative value -30 means 
+                                           that the student registered to module
+                                           presentation 30 days before 
+                                           it started)
+   date_unregistration  integer    days    date of student unregistration from 
+                                           the module presentation, this is the 
+                                           number of days measured relative to 
+                                           the start of the module-presentation.
+                                           Students, who completed the course 
+                                           have this field empty. Students who 
+                                           unregistered have Withdrawal as the 
+                                           value of the final_result column in 
+                                           the studentInfo.csv file
+   -----------------------------------------------------------------------------                                       
+   studentAssessment.csv
+   -----------------------------------------------------------------------------
+   id_assessment        integer            the identification number 
+                                           of the assessment
+   id_student           integer            a unique identification number 
+                                           for the student
+   date_submitted       integer    days    the date of student submission, 
+                                           measured as the number of days since 
+                                           the start of the module presentation
+   is_banked            integer            a status flag indicating that the 
+                                           assessment result has been 
+                                           transferred from a previous 
+                                           presentation
+   score                integer            the student�s score in 
+                                           this assessment. The range is from
+                                           0 to 100. The score lower than 40 is 
+                                           interpreted as Fail. The marks are in
+                                           the range from 0 to 100
+   -----------------------------------------------------------------------------
+   studentVle.csv
+   -----------------------------------------------------------------------------
+   code_module          nominal            an identification code for a module
+   code_presentation    nominal            the identification code of the 
+                                           module presentation
+   id_student           integer            a unique identification number 
+                                           for the student
+   id_site              integer            an identification number for the 
+                                           VLE material
+   date                 integer    days    the date of student�s interaction 
+                                           with the material measured as the 
+                                           number of days since the start of 
+                                           the module-presentation
+   sum_click            integer            the number of times a student 
+                                           interacts with the material in 
+                                           that day 
+
+8. Missing Attribute Values: Yes
+
+
+9. Class Distribution:
+
+	Class	      Examples
+	----------- ---------
+	Distinction 3024
+  Fail        7052 
+  Pass        12361
+  Withdrawn   10156
+  ----------- ---------
+  Total       32593
