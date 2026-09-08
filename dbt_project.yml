@@ -1,0 +1,20 @@
+name: 'oulad_pipeline'
+version: '1.0.0'
+config-version: 2
+
+profile: 'oulad_pipeline'
+
+model-paths: ["src"]
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  oulad_pipeline:
+    01_bronze:
+      +materialized: view
+    02_silver:
+      +materialized: table
+    03_gold:
+      +materialized: table
