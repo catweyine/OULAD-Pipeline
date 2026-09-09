@@ -3,7 +3,7 @@ oulad_pipeline:
   outputs:
     dev:
       type: databricks
-      catalog: main  # <--- Add your Unity Catalog name here (e.g., main)
+      catalog: workspace  # <--- Add your Unity Catalog name here (e.g., main)
       schema: oulad_gold
       host: "{{ env_var('DATABRICKS_HOST') }}"
       http_path: "{{ env_var('DATABRICKS_HTTP_PATH') }}"
