@@ -1,6 +1,6 @@
 USE CATALOG oulad;
 
-CREATE OR REPLACE TABLE oulad.oulad_gold.fact_student_performace 
+CREATE OR REPLACE TABLE oulad.oulad_gold.fact_student_performance 
 USING DELTA
 AS
 SELECT sp.id_student, sp.id_assessment, a.code_module, a.code_presentation,
