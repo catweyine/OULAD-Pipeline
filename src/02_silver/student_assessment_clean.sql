@@ -50,7 +50,7 @@ USING (
             id_student,
             date_submitted,
             is_banked,
-            TRY_CAST(score AS DOUBLE) AS score,
+            TRY_CAST(score AS DOUBLE),
             CAST(score AS STRING) AS score_source,
             ingestion_timestamp,
             ROW_NUMBER() OVER (
