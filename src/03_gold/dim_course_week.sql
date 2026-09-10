@@ -1,0 +1,56 @@
+CREATE TABLE IF NOT EXISTS oulad.oulad_gold.dim_course_week (
+    course_id STRING,
+    week_id INT,
+    week_number INT,
+    phase_id INT
+)
+USING DELTA;
+
+MERGE INTO oulad.oulad_gold.dim_course_week AS tgt
+USING (
+
+    SELECT
+        CONCAT(code_module, '_', code_presentation) AS course_id,
+        week_number AS week_id,
+        week_number,
+
+        CASE
+            WHEN week_number <= 10 THEN 1
+            WHEN week_number <= 20 THEN 2
+            ELSE 3
+        END AS phase_id
+
+    FROM (
+        SELECT DISTINCT
+            code_module,
+            code_presentation
+        FROM oulad.oulad_silver.courses_silver
+    ) c
+
+    CROSS JOIN (
+        SELECT EXPLODE(SEQUENCE(1, 40)) AS week_number
+    ) w
+
+) src
+
+ON tgt.course_id = src.course_id
+AND tgt.week_id = src.week_id
+
+WHEN MATCHED THEN
+UPDATE SET
+    tgt.week_number = src.week_number,
+    tgt.phase_id = src.phase_id
+
+WHEN NOT MATCHED THEN
+INSERT (
+    course_id,
+    week_id,
+    week_number,
+    phase_id
+)
+VALUES (
+    src.course_id,
+    src.week_id,
+    src.week_number,
+    src.phase_id
+);
