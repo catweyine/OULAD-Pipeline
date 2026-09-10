@@ -1,6 +1,6 @@
 # OULAD Data Pipeline
 **Project Status:** Week 7 FTW Activity  
-**Pipeline Pattern:** Bronze → Silver → Gold → Quality Check → Dashboard <br>
+**Pipeline Pattern:** Setup → Bronze → Quality Check → Silver → Quality Check → Gold → Quality Check → Dashboard <br>
 **Query Language:** SQL
 
 ----
@@ -16,35 +16,41 @@ The OULAD dataset contains data from courses at the Open University, including s
 ```
 OULAD-Pipeline/
 ├── README.md                      
-├── source_code/
+├── src/
 │   ├── 00_setup/
-│   │   └── 01_setup.sql             
+│   │   ├── 00_setup.sql
+│   │   └── 01_source_inspection.ip.ipynb
 │   ├── 01_bronze/
-│   │   ├── 02_bronze_assessments.sql  
-│   │   ├── 03_bronze_courses.sql     
-│   │   ├── 04_bronze_students.sql    
-│   │   ├── 05_bronze_studentAssessment.sql   
-│   │   ├── 06_bronze_studentVle.sql     
-│   │   ├── 07_bronze_vle.sql         
-│   │   └── 08_bronze_studentRegistration.sql 
+│   │   ├── assessments_bronze.sql  
+│   │   ├── courses_bronze.sql     
+│   │   ├── student_assessment_bronze.sql   
+│   │   ├── student_info_bronze.sql    
+│   │   ├── student_registration_bronze.sql 
+│   │   ├── student_vle_bronze.sql     
+│   │   └── vle_bronze.sql         
 │   ├── 02_silver/
-│   │   ├── 09_silver_assessments.sql    
-│   │   ├── 10_silver_courses.sql        
-│   │   ├── 11_silver_students.sql    
-│   │   ├── 12_silver_studentAssessment.sql   
-│   │   ├── 13_silver_studentVle.sql    
-│   │   ├── 14_silver_vle.sql         
-│   │   └── 15_silver_studentRegistration.sql 
+│   │   ├── assessments_clean.sql    
+│   │   ├── courses_clean.sql        
+│   │   ├── student_assessment_clean.sql   
+│   │   ├── student_info_clean.sql    
+│   │   ├── student_registration_clean.sql 
+│   │   ├── student_vle_clean.sql    
+│   │   └── vle_clean.sql         
 │   └── 03_gold/
-│       ├── 16_gold_dim_student.sql    
-│       ├── 17_gold_dim_course.sql      
-│       ├── 18_gold_dim_assessment.sql   
-│       ├── 19_gold_fact_student_vle.sql
-│       └── 20_gold_fact_assessment_scores.sql
-└── quality_check/
-    ├── 09_bronze_validation.sql      
-    ├── 16_silver_validation.sql       
-    └── 11_gold_validation.sql           
+│       ├── dim_assessment.sql
+│       ├── dim_course.sql
+│       ├── dim_course_phase.sql
+│       ├── dim_course_week.sql
+│       ├── dim_student.sql
+│       ├── dim_student_enrollment.sql
+│       ├── dim_student_info.sql
+│       ├── dim_vle.sql
+│       ├── fact_student_performance.sql
+│       └── fact_student_vle_engagement.sql
+└── tests/
+    ├── bronze_validation
+    ├── silver_validation       
+    └── gold_validation           
 ```
 
 ## Naming Convention
@@ -63,11 +69,49 @@ OULAD-Pipeline/
 ## Pipeline Architecture
 
 ```
-┌─────────────┐      ┌──────────────┐      ┌─────────────┐
-│   Bronze    │      │   Silver     │      │    Gold     │
-│  (Source)   │ ───> │  (Cleaned)   │ ───> │  (Marts)    │
-└─────────────┘      └──────────────┘      └─────────────┘
-   oulad_bronze        oulad_silver         oulad_gold
+       ┌─────────────────────┐
+       │  00_setup.sql      │
+       │  source_inspection │
+       └──────────┬──────────┘
+                  │
+                  ↓
+       ┌──────────┴──────────┐
+       │   Bronze Layer     │
+       │   (7 tables)       │
+       │   oulad_bronze     │
+       └──────────┬──────────┘
+                  │
+                  ↓
+       ┌──────────┴──────────┐
+       │ ✅ Quality Check   │
+       │ bronze_validation │
+       └──────────┬──────────┘
+                  │
+                  ↓
+       ┌──────────┴──────────┐
+       │   Silver Layer     │
+       │   (7 tables)       │
+       │   oulad_silver     │
+       └──────────┬──────────┘
+                  │
+                  ↓
+       ┌──────────┴──────────┐
+       │ ✅ Quality Check   │
+       │ silver_validation │
+       └──────────┬──────────┘
+                  │
+                  ↓
+       ┌──────────┴──────────┐
+       │   Gold Layer       │
+       │   (8 dim, 2 fact)  │
+       │   oulad_gold       │
+       └──────────┬──────────┘
+                  │
+                  ↓
+       ┌──────────┴──────────┐
+       │ ✅ Quality Check   │
+       │ gold_validation   │
+       └─────────────────────┘
 ```
 
 ### Layer Details
@@ -79,8 +123,8 @@ OULAD-Pipeline/
    * Range validation (CASE/WHEN for valid values)
    * Referential integrity checks
 3. **Gold Layer** — Creates star schema with:
-   * Dimension tables (students, courses, assessments, modules)
-   * Fact tables (student interactions, assessment scores, VLE activity)
+   * **Dimension tables (8):** dim_student, dim_student_info, dim_student_enrollment, dim_course, dim_course_phase, dim_course_week, dim_assessment, dim_vle
+   * **Fact tables (2):** fact_student_performance, fact_student_vle_engagement
 
 ## Business Questions
 
@@ -106,28 +150,39 @@ This pipeline enables analysis to answer key questions about student success:
 ### Execution Steps
 
 1. **Setup Schemas**
-   * Execute `source_code/00_setup/01_setup.sql`
+   * Execute `src/00_setup/00_setup.sql`
    * Creates `workspace.oulad_bronze`, `workspace.oulad_silver`, `workspace.oulad_gold` schemas
 
-2. **Load Raw Data**
-   * Execute all files in `source_code/01_bronze/` folder (in numeric order)
+2. **Source Inspection**
+   * Execute `src/00_setup/01_source_inspection.ip.ipynb`
+   * Inspects source data files and validates structure
+
+3. **Load Raw Data (Bronze Layer)**
+   * Execute all files in `src/01_bronze/` folder
    * Each file loads one source table into `workspace.oulad_bronze`
-   * Verify row counts and schema after loading
+   * 7 tables: assessments, courses, student_assessment, student_info, student_registration, student_vle, vle
 
-3. **Clean and Transform**
-   * Execute all files in `source_code/02_silver/` folder (in numeric order)
+4. **Bronze Quality Validation**
+   * Execute `tests/bronze_validation`
+   * Validates bronze layer row counts, schema, and data integrity
+
+5. **Clean and Transform (Silver Layer)**
+   * Execute all files in `src/02_silver/` folder
    * Creates cleaned tables in `workspace.oulad_silver`
-   * Review data quality check results
+   * Applies type casting, TRIM, NULLIF, validation rules
 
-4. **Create Gold Marts**
-   * Execute all files in `source_code/03_gold/` folder (in numeric order)
-   * Builds fact and dimension tables in `workspace.oulad_gold`
+6. **Silver Quality Validation**
+   * Execute `tests/silver_validation`
+   * Validates silver layer data quality and transformation rules
+
+7. **Create Gold Marts**
+   * Execute all files in `src/03_gold/` folder
+   * Builds 8 dimension tables (student, course, assessment, VLE, enrollment, phases, weeks) and 2 fact tables (student performance, VLE engagement) in `workspace.oulad_gold`
    * Ready for analysis and dashboard creation
 
-5. **Data Quality Validation** 
-   * Execute `quality_check/09_bronze_validation.sql` to validate bronze layer
-   * Execute `quality_check/10_silver_validation.sql` to validate silver layer
-   * Execute `quality_check/11_gold_validation.sql` to validate gold layer
+8. **Gold Quality Validation**
+   * Execute `tests/gold_validation`
+   * Final validation of gold layer dimensional models and metrics
 
 
 
