@@ -41,7 +41,7 @@ INNER JOIN oulad.oulad_gold.dim_student AS ds
     ON sp.id_student = ds.student_id
 
 INNER JOIN oulad.oulad_gold.dim_assessment AS da
-    ON sp.id_assessment = da.id_assessment
+    ON sp.id_assessment = da.assessment_key
 
 INNER JOIN oulad.oulad_gold.dim_course AS dc
     ON  a.code_module = dc.code_module
