@@ -11,13 +11,12 @@ SELECT
     -- Foreign keys from Gold dimensions
     ds.student_id,
     da.assessment_key,
-    dmp.course_id,
+    dc.course_id,
     -- Measures / fact attributes
     sp.date_submitted AS submission_day_offset,
     sp.is_banked,
     sp.score,
-    CASE
-        WHEN da.assessment_day_offset IS NOT NULL
+    CASE WHEN da.assessment_day_offset IS NOT NULL
          AND sp.date_submitted IS NOT NULL
         THEN sp.date_submitted - da.assessment_day_offset
         ELSE NULL
@@ -35,16 +34,16 @@ SELECT
 
 FROM oulad.oulad_silver.student_assessment_silver AS sp
 
+INNER JOIN oulad.oulad_silver.assessments_silver AS a
+    ON sp.id_assessment = a.id_assessment
+
 INNER JOIN oulad.oulad_gold.dim_student AS ds
     ON sp.id_student = ds.student_id
 
 INNER JOIN oulad.oulad_gold.dim_assessment AS da
     ON sp.id_assessment = da.id_assessment
 
-INNER JOIN oulad.oulad_gold.dim_course AS dmp
-    ON da.module_presentation_key = dmp.course_id;
+INNER JOIN oulad.oulad_gold.dim_course AS dc
+    ON  a.code_module = dc.code_module
+    AND a.code_presentation = dc.code_presentation;
 
-
-
-
-select * from oulad.oulad_gold.fact_student_performance limit 10;
