@@ -1,0 +1,71 @@
+
+-- Business Question BP3: How does student activity change throughout a course?
+
+-- 1. Overall activity curve — all courses combined
+
+SELECT
+    week_number,
+    SUM(total_clicks)                                    AS total_clicks,
+    COUNT(DISTINCT code_module || code_presentation)      AS courses_represented,
+    -- normalize so courses with more students don't dominate
+    -- the shape of the curve
+    ROUND(SUM(total_clicks) * 1.0 / NULLIF(SUM(active_students), 0), 2) AS avg_clicks_per_active_student
+FROM oulad.oulad_gold.analysis_activity_trends
+GROUP BY week_number
+ORDER BY week_number;
+
+ 2. Per-course activity curve
+SELECT
+    code_module,
+    code_presentation,
+    week_number,
+    SUM(total_clicks)     AS total_clicks,
+    SUM(active_students)  AS active_students
+FROM oulad.oulad_gold.analysis_activity_trends
+GROUP BY code_module, code_presentation, week_number
+ORDER BY code_module, code_presentation, week_number;
+
+-- 3. Engagement momentum — week-over-week % change
+
+WITH weekly AS (
+    SELECT
+        week_number,
+        SUM(total_clicks) AS total_clicks
+    FROM oulad.oulad_gold.analysis_activity_trends
+    GROUP BY week_number
+)
+SELECT
+    week_number,
+    total_clicks,
+    LAG(total_clicks) OVER (ORDER BY week_number) AS prev_week_clicks,
+    ROUND(
+        (total_clicks - LAG(total_clicks) OVER (ORDER BY week_number)) * 100.0
+        / NULLIF(LAG(total_clicks) OVER (ORDER BY week_number), 0), 1
+    ) AS pct_change_week_over_week
+FROM weekly
+ORDER BY week_number;
+
+-- 4. Activity type mix over time
+
+SELECT
+    week_number,
+    activity_type,
+    SUM(total_clicks) AS total_clicks
+FROM oulad.oulad_gold.analysis_activity_trends
+GROUP BY week_number, activity_type
+ORDER BY week_number, total_clicks DESC;
+
+-- 5. Early vs. late engagement, per student
+
+SELECT
+    id_student,
+    code_module,
+    code_presentation,
+    SUM(CASE WHEN week_number <= 4 THEN click_count ELSE 0 END)  AS early_clicks,
+    SUM(CASE WHEN week_number > 4 THEN click_count ELSE 0 END)   AS late_clicks,
+    ROUND(
+        SUM(CASE WHEN week_number > 4 THEN click_count ELSE 0 END) * 1.0
+        / NULLIF(SUM(CASE WHEN week_number <= 4 THEN click_count ELSE 0 END), 0), 2
+    ) AS late_to_early_ratio
+FROM oulad.oulad_gold.fact_student_vle_engagement
+GROUP BY id_student, code_module, code_presentation;
