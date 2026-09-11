@@ -22,7 +22,7 @@ USING (
         CAST(si.num_of_prev_attempts AS INT) AS num_of_prev_attempts,
         CAST(si.studied_credits AS INT) AS studied_credits,
         TRIM(si.final_result) AS final_result,
-        CAST(sr.date_registration AS INT) AS date_registration,
+        UNIX_DATE(sr.date_registration) AS date_registration,
         GREATEST(si.ingestion_timestamp, sr.ingestion_timestamp) AS ingestion_timestamp
     FROM (
         SELECT *,
