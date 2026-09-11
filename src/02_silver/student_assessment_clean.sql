@@ -50,7 +50,7 @@ USING (
             id_student,
             date_submitted,
             is_banked,
-            TRY_CAST(score AS DOUBLE) AS score,
+            TRY_CAST(score AS DOUBLE),
             CAST(score AS STRING) AS score_source,
             ingestion_timestamp,
             ROW_NUMBER() OVER (
@@ -98,8 +98,4 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED THEN
     INSERT (id_assessment, id_student, date_submitted, is_banked, score, score_source, ingestion_timestamp, ingestion_date)
     VALUES (source.id_assessment, source.id_student, source.date_submitted, source.is_banked, source.score, source.score_source, source.ingestion_timestamp, source.ingestion_date);
- 
--- Check the table
-SELECT *
-FROM oulad.oulad_silver.student_assessment_silver
-LIMIT 10;
+

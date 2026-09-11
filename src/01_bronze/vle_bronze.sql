@@ -4,4 +4,4 @@ AS
 SELECT *,
   current_timestamp() AS ingestion_timestamp,
   current_date() AS ingestion_date
-FROM read_files('/Volumes/instacart/default/ftw_b12_de/shared/week07/vle.csv');
+FROM read_files('/Volumes/workspace/default/ftw_b12_de/shared/week07/vle.csv');

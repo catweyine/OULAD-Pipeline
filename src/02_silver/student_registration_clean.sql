@@ -1,6 +1,3 @@
-SELECT *
-FROM oulad.oulad_bronze.student_registration_bronze
-LIMIT 10;
 
 -- Create the clean table for student_registration
 CREATE TABLE IF NOT EXISTS oulad.oulad_silver.student_registration_silver (
@@ -23,8 +20,8 @@ USING (
         UPPER(TRIM(code_module)) AS code_module,
         UPPER(TRIM(code_presentation)) AS code_presentation,
         id_student,
-        CAST(date_registration AS DATE) AS date_registration,
-        CAST(date_unregistration AS DATE) AS date_unregistration,
+        TRY_CAST(date_registration AS DATE) AS date_registration,
+        TRY_CAST(date_unregistration AS DATE) AS date_unregistration,
         ingestion_timestamp,
         CAST(ingestion_timestamp AS DATE) AS ingestion_date
     FROM (
@@ -51,8 +48,3 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED THEN
     INSERT (code_module, code_presentation, id_student, date_registration, date_unregistration, ingestion_timestamp, ingestion_date)
     VALUES (source.code_module, source.code_presentation, source.id_student, source.date_registration, source.date_unregistration, source.ingestion_timestamp, source.ingestion_date);
-
--- Check the table
-SELECT *
-FROM oulad.oulad_silver.student_registration_silver
-LIMIT 10;

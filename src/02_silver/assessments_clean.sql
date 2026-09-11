@@ -104,9 +104,5 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED THEN
     INSERT (id_assessment, code_module, code_presentation, assessment_type, `date`, date_source, weight, ingestion_timestamp, ingestion_date)
     VALUES (source.id_assessment, source.code_module, source.code_presentation, source.assessment_type, source.`date`, source.date_source, source.weight, source.ingestion_timestamp, source.ingestion_date);
- 
--- Check the table
-SELECT *
-FROM oulad.oulad_silver.assessments_silver
-LIMIT 10;
+
  
