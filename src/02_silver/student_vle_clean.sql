@@ -1,3 +1,5 @@
+-- Create the silver schema if it doesn't exist
+CREATE SCHEMA IF NOT EXISTS oulad.oulad_silver;
 
 -- Create the clean (silver) table for student_vle
 CREATE TABLE IF NOT EXISTS oulad.oulad_silver.student_vle_silver (
