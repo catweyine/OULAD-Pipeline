@@ -4,8 +4,6 @@ AS
 SELECT
    -- Identity / foreign keys
    XXHASH64(
-        sv.code_module,
-        sv.code_presentation,
         sv.id_student,
         sv.id_site,
         sv.date
@@ -14,7 +12,6 @@ SELECT
    sv.id_student,
    sv.id_site,
    dc.course_id,
-
 
    -- Time dimension: days since the start of the module-presentation,
    -- per the OULAD data dictionary. Can be negative (access before
@@ -56,10 +53,12 @@ LEFT JOIN oulad.oulad_gold.dim_course AS dc
   AND sv.code_presentation = dc.code_presentation;
 
 
+
+
 -- ---------------------------------------------------------
 -- Sanity check: confirm the fact table populated as expected
 -- ---------------------------------------------------------
-SELECT *
+/* SELECT *
 FROM oulad.oulad_gold.fact_student_engagement
 LIMIT 10;
 
@@ -67,3 +66,19 @@ LIMIT 10;
 SELECT COUNT(*) AS total_rows
 FROM oulad.oulad_gold.fact_student_engagement;
 
+SELECT COUNT(*) - COUNT(DISTINCT CONCAT_WS('|',
+         CAST(id_student AS STRING), CAST(id_site AS STRING),
+         CAST(interaction_date AS STRING))) AS duplicate_grain
+FROM oulad.oulad_gold.fact_student_engagement;
+
+SELECT
+  COUNT(*) - COUNT(DISTINCT CONCAT_WS('|', CAST(id_student AS STRING),
+                   CAST(id_site AS STRING), CAST(interaction_date AS STRING))) AS full_key,
+  COUNT(*) - COUNT(DISTINCT CONCAT_WS('|', CAST(id_site AS STRING),
+                   CAST(interaction_date AS STRING)))                          AS drop_student,
+  COUNT(*) - COUNT(DISTINCT CONCAT_WS('|', CAST(id_student AS STRING),
+                   CAST(interaction_date AS STRING)))                          AS drop_site,
+  COUNT(*) - COUNT(DISTINCT CONCAT_WS('|', CAST(id_student AS STRING),
+                   CAST(id_site AS STRING)))                                   AS drop_date
+FROM oulad.oulad_gold.fact_student_engagement;
+*/
