@@ -4,8 +4,6 @@ AS
 SELECT
    -- Identity / foreign keys
    XXHASH64(
-        sv.code_module,
-        sv.code_presentation,
         sv.id_student,
         sv.id_site,
         sv.date
@@ -14,7 +12,6 @@ SELECT
    sv.id_student,
    sv.id_site,
    dc.course_id,
-
 
    -- Time dimension: days since the start of the module-presentation,
    -- per the OULAD data dictionary. Can be negative (access before
@@ -54,16 +51,3 @@ LEFT JOIN oulad.oulad_gold.dim_vle AS dv
 LEFT JOIN oulad.oulad_gold.dim_course AS dc
    ON sv.code_module = dc.code_module
   AND sv.code_presentation = dc.code_presentation;
-
-
--- ---------------------------------------------------------
--- Sanity check: confirm the fact table populated as expected
--- ---------------------------------------------------------
-SELECT *
-FROM oulad.oulad_gold.fact_student_engagement
-LIMIT 10;
-
-
-SELECT COUNT(*) AS total_rows
-FROM oulad.oulad_gold.fact_student_engagement;
-
