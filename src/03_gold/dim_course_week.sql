@@ -11,8 +11,20 @@ USING (
 
     WITH week_bounds AS (
         SELECT
-            CAST(FLOOR(MIN(date) / 7.0) AS INT) AS min_week,
-            CAST(CEIL(MAX(date) / 7.0) AS INT) AS max_week
+            MIN(
+                CASE
+                    WHEN date >= 0 THEN CEIL(date / 7.0)
+                    ELSE FLOOR(date / 7.0)
+                END
+            ) AS min_week,
+
+            MAX(
+                CASE
+                    WHEN date >= 0 THEN CEIL(date / 7.0)
+                    ELSE FLOOR(date / 7.0)
+                END
+            ) AS max_week
+
         FROM oulad.oulad_silver.student_vle_silver
     ),
 
