@@ -15,9 +15,6 @@ SELECT
 
 FROM oulad.oulad_silver.student_vle_silver AS sv
 
-LEFT JOIN oulad.oulad_gold.dim_vle AS dv
-   ON sv.id_site = dv.vle_id
-
 LEFT JOIN oulad.oulad_gold.dim_course AS dc
    ON sv.code_module = dc.code_module
   AND sv.code_presentation = dc.code_presentation;
