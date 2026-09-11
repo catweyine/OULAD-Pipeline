@@ -1,7 +1,4 @@
-SELECT *
-FROM oulad.oulad_bronze.student_vle_bronze
-LIMIT 10;
- 
+
 -- Create the clean (silver) table for student_vle
 CREATE TABLE IF NOT EXISTS oulad.oulad_silver.student_vle_silver (
     code_module        STRING,
@@ -58,9 +55,5 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED THEN
     INSERT (code_module, code_presentation, id_student, id_site, date, sum_click, ingestion_timestamp, ingestion_date)
     VALUES (source.code_module, source.code_presentation, source.id_student, source.id_site, source.date, source.sum_click, source.ingestion_timestamp, source.ingestion_date);
- 
--- Check the table
-SELECT *
-FROM oulad.oulad_silver.student_vle_silver
-LIMIT 10;
+
  

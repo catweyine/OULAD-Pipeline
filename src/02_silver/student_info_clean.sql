@@ -1,7 +1,3 @@
-SELECT *
-FROM oulad.oulad_bronze.student_info_bronze
-LIMIT 10;
-
 -- Create the clean table for student_info
 CREATE TABLE IF NOT EXISTS oulad.oulad_silver.student_info_silver (
     code_module STRING,
@@ -91,9 +87,5 @@ WHEN NOT MATCHED THEN
     INSERT (code_module, code_presentation, id_student, gender, region, highest_education, imd_band, age_band, num_of_prev_attempts, studied_credits, disability, final_result, ingestion_timestamp, ingestion_date)
     VALUES (source.code_module, source.code_presentation, source.id_student, source.gender, source.region, source.highest_education, source.imd_band, source.age_band, source.num_of_prev_attempts, source.studied_credits, source.disability, source.final_result, source.ingestion_timestamp, source.ingestion_date);
 
--- Check the table
-SELECT *
-FROM oulad.oulad_silver.student_info_silver
-LIMIT 10;
 
 
