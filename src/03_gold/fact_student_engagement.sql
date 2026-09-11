@@ -51,34 +51,3 @@ LEFT JOIN oulad.oulad_gold.dim_vle AS dv
 LEFT JOIN oulad.oulad_gold.dim_course AS dc
    ON sv.code_module = dc.code_module
   AND sv.code_presentation = dc.code_presentation;
-
-
-
-
--- ---------------------------------------------------------
--- Sanity check: confirm the fact table populated as expected
--- ---------------------------------------------------------
-/* SELECT *
-FROM oulad.oulad_gold.fact_student_engagement
-LIMIT 10;
-
-
-SELECT COUNT(*) AS total_rows
-FROM oulad.oulad_gold.fact_student_engagement;
-
-SELECT COUNT(*) - COUNT(DISTINCT CONCAT_WS('|',
-         CAST(id_student AS STRING), CAST(id_site AS STRING),
-         CAST(interaction_date AS STRING))) AS duplicate_grain
-FROM oulad.oulad_gold.fact_student_engagement;
-
-SELECT
-  COUNT(*) - COUNT(DISTINCT CONCAT_WS('|', CAST(id_student AS STRING),
-                   CAST(id_site AS STRING), CAST(interaction_date AS STRING))) AS full_key,
-  COUNT(*) - COUNT(DISTINCT CONCAT_WS('|', CAST(id_site AS STRING),
-                   CAST(interaction_date AS STRING)))                          AS drop_student,
-  COUNT(*) - COUNT(DISTINCT CONCAT_WS('|', CAST(id_student AS STRING),
-                   CAST(interaction_date AS STRING)))                          AS drop_site,
-  COUNT(*) - COUNT(DISTINCT CONCAT_WS('|', CAST(id_student AS STRING),
-                   CAST(id_site AS STRING)))                                   AS drop_date
-FROM oulad.oulad_gold.fact_student_engagement;
-*/
