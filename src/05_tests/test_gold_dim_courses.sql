@@ -71,4 +71,23 @@ SELECT
         THEN 'PASS'
         ELSE 'FAIL'
     END AS status,
-    'Gold dimension should 
+    'Gold dimension should contain all unique course combinations from silver' AS description
+FROM oulad.oulad_silver.courses_silver;
+
+-- SECTION 3: SUMMARY REPORT
+
+-- CHECK 3.1: Overall Table Profile
+-- Purpose: High-level overview of dimension quality
+SELECT
+    'SUMMARY' AS check_category,
+    'Table Profile' AS check_name,
+    COUNT(*) AS total_rows,
+    COUNT(DISTINCT course_id) AS distinct_course_id,
+    COUNT(*) - COUNT(DISTINCT course_id) AS duplicate_course_id,
+    SUM(CASE WHEN course_id IS NULL THEN 1 ELSE 0 END) AS null_course_id,
+    SUM(CASE WHEN code_module IS NULL THEN 1 ELSE 0 END) AS null_code_module,
+    SUM(CASE WHEN code_presentation IS NULL THEN 1 ELSE 0 END) AS null_code_presentation,
+    SUM(CASE WHEN module_presentation_length IS NULL THEN 1 ELSE 0 END) AS null_module_presentation_length,
+    'INFO' AS status,
+    'Gold dimension overview statistics' AS description
+FROM oulad.oulad_gold.dim_course;

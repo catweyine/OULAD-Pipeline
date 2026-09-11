@@ -29,22 +29,24 @@ SELECT
     SUM(CASE WHEN week_from IS NULL THEN 1 ELSE 0 END) AS null_week_from,
     SUM(CASE WHEN week_to IS NULL THEN 1 ELSE 0 END) AS null_week_to,
     CASE
-        WHEN SUM(CASE
-                    WHEN id_site IS NULL
-                     OR code_module IS NULL
-                     OR code_presentation IS NULL
-                     OR activity_type IS NULL
-                     OR week_from IS NULL
-                     OR week_to IS NULL
-                    THEN 1 ELSE 0
-                 END) = 0
+        WHEN SUM(
+            CASE
+                WHEN id_site IS NULL
+                  OR code_module IS NULL
+                  OR code_presentation IS NULL
+                  OR activity_type IS NULL
+                  OR week_from IS NULL
+                  OR week_to IS NULL
+                THEN 1 ELSE 0
+            END
+        ) = 0
         THEN 'PASS'
         ELSE 'WARNING'
     END AS status,
     'Critical columns should be reviewed for missing values' AS description
 FROM oulad.oulad_bronze.vle_bronze;
 
--- CHECK 1.3: UNIQUENESS - Duplicate Primary Key
+-- CHECK 1.3: UNIQUENESS - Duplicate Site IDs
 -- Purpose: Detect duplicate VLE site identifiers in raw data
 WITH duplicate_check AS (
     SELECT
@@ -208,6 +210,9 @@ SELECT
             THEN 1 ELSE 0
         END
     ) AS negative_week_records,
+    MIN(ingestion_date) AS earliest_ingestion,
+    MAX(ingestion_date) AS latest_ingestion,
     'INFO' AS status,
     'Bronze layer overview statistics' AS description
 FROM oulad.oulad_bronze.vle_bronze;
+ 

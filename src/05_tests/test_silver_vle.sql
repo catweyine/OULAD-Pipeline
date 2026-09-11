@@ -127,6 +127,8 @@ SELECT
     SUM(CASE WHEN week_from IS NULL THEN 1 ELSE 0 END) AS null_week_from,
     SUM(CASE WHEN week_to IS NULL THEN 1 ELSE 0 END) AS null_week_to,
     SUM(CASE WHEN week_from > week_to THEN 1 ELSE 0 END) AS invalid_week_range_records,
+    MIN(ingestion_date) AS earliest_ingestion,
+    MAX(ingestion_date) AS latest_ingestion,
     'INFO' AS status,
     'Silver layer overview statistics' AS description
 FROM oulad.oulad_silver.vle_silver;

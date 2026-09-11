@@ -26,10 +26,14 @@ SELECT
     SUM(CASE WHEN code_presentation IS NULL THEN 1 ELSE 0 END) AS null_code_presentation,
     SUM(CASE WHEN module_presentation_length IS NULL THEN 1 ELSE 0 END) AS null_module_presentation_length,
     CASE
-        WHEN SUM(CASE WHEN code_module IS NULL
-                       OR code_presentation IS NULL
-                       OR module_presentation_length IS NULL
-                       THEN 1 ELSE 0 END) = 0
+        WHEN SUM(
+            CASE
+                WHEN code_module IS NULL
+                  OR code_presentation IS NULL
+                  OR module_presentation_length IS NULL
+                THEN 1 ELSE 0
+            END
+        ) = 0
         THEN 'PASS'
         ELSE 'WARNING'
     END AS status,
@@ -105,6 +109,8 @@ SELECT
     SUM(CASE WHEN code_presentation IS NULL THEN 1 ELSE 0 END) AS null_code_presentation,
     SUM(CASE WHEN module_presentation_length IS NULL THEN 1 ELSE 0 END) AS null_module_presentation_length,
     SUM(CASE WHEN module_presentation_length <= 0 THEN 1 ELSE 0 END) AS invalid_presentation_length_records,
+    MIN(ingestion_date) AS earliest_ingestion,
+    MAX(ingestion_date) AS latest_ingestion,
     'INFO' AS status,
     'Bronze layer overview statistics' AS description
 FROM oulad.oulad_bronze.courses_bronze;
