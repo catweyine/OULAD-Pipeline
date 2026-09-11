@@ -29,7 +29,7 @@ USING (
         UPPER(TRIM(gender)) AS gender,
         TRIM(region) AS region,
         TRIM(highest_education) AS highest_education,
-        TRIM(imd_band) AS imd_band,
+        CASE WHEN TRIM(imd_band) = '?' THEN NULL ELSE TRIM(imd_band) END AS imd_band,
         TRIM(age_band) AS age_band,
         num_of_prev_attempts,
         studied_credits,
@@ -43,7 +43,10 @@ USING (
         CAST(ingestion_timestamp AS DATE) AS ingestion_date
     FROM (
         SELECT *,
-               ROW_NUMBER() OVER (PARTITION BY id_student ORDER BY ingestion_timestamp DESC) AS row_num
+               ROW_NUMBER() OVER (
+                   PARTITION BY code_module, code_presentation, id_student
+                   ORDER BY ingestion_timestamp DESC
+               ) AS row_num
         FROM oulad.oulad_bronze.student_info_bronze
         WHERE code_module IS NOT NULL
           AND code_presentation IS NOT NULL
@@ -53,7 +56,6 @@ USING (
           AND region IS NOT NULL
           AND highest_education IS NOT NULL
           AND imd_band IS NOT NULL
-          AND imd_band != '?'
           AND age_band IS NOT NULL
           AND num_of_prev_attempts IS NOT NULL
           AND num_of_prev_attempts >= 0
@@ -86,6 +88,3 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED THEN
     INSERT (code_module, code_presentation, id_student, gender, region, highest_education, imd_band, age_band, num_of_prev_attempts, studied_credits, disability, final_result, ingestion_timestamp, ingestion_date)
     VALUES (source.code_module, source.code_presentation, source.id_student, source.gender, source.region, source.highest_education, source.imd_band, source.age_band, source.num_of_prev_attempts, source.studied_credits, source.disability, source.final_result, source.ingestion_timestamp, source.ingestion_date);
-
-
-
