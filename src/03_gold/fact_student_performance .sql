@@ -1,18 +1,12 @@
 CREATE OR REPLACE TABLE oulad.oulad_gold.fact_student_performance
 USING DELTA
 AS
--- Grain: 1 row = 1 student x 1 assessment
 SELECT
-    -- Fact surrogate key
-    XXHASH64(
-        sp.id_student,
-        sp.id_assessment
-    ) AS student_performance_key,
-    -- Foreign keys from Gold dimensions
+    XXHASH64(sp.id_student, sp.id_assessment) AS student_performance_key,
     ds.student_id,
     da.assessment_key,
     dc.course_id,
-    -- Measures / fact attributes
+    dcw.week_id,
     sp.date_submitted AS submission_day_offset,
     sp.is_banked,
     sp.score,
@@ -21,13 +15,8 @@ SELECT
         THEN sp.date_submitted - da.assessment_day_offset
         ELSE NULL
     END AS days_late,
-    CASE
-        WHEN sp.score IS NULL THEN TRUE
-        ELSE FALSE
-    END AS is_non_submission,
-    CASE
-        WHEN sp.score IS NOT NULL
-         AND da.weight IS NOT NULL
+    CASE WHEN sp.score IS NULL THEN TRUE ELSE FALSE END AS is_non_submission,
+    CASE WHEN sp.score IS NOT NULL AND da.weight IS NOT NULL
         THEN sp.score * da.weight / 100.0
         ELSE NULL
     END AS weighted_score
@@ -45,5 +34,8 @@ INNER JOIN oulad.oulad_gold.dim_assessment AS da
 
 INNER JOIN oulad.oulad_gold.dim_course AS dc
     ON  a.code_module = dc.code_module
-    AND a.code_presentation = dc.code_presentation;
+    AND a.code_presentation = dc.code_presentation
 
+LEFT JOIN oulad.oulad_gold.dim_course_week AS dcw
+    ON  dcw.course_id = dc.course_id
+    AND dcw.week_id  = CASE WHEN sp.date_submitted>=0 THEN CEIL(sp.date_submitted / 7.0) ELSE FLOOR(sp.date_submitted/7.0) END ;
