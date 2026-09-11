@@ -9,14 +9,27 @@ USING DELTA;
 MERGE INTO oulad.oulad_gold.dim_course_week AS tgt
 USING (
 
+    WITH week_bounds AS (
+        SELECT
+            CAST(FLOOR(MIN(date) / 7.0) AS INT) AS min_week,
+            CAST(CEIL(MAX(date) / 7.0) AS INT) AS max_week
+        FROM oulad.oulad_silver.student_vle_silver
+    ),
+
+    generated_weeks AS (
+        SELECT
+            EXPLODE(SEQUENCE(min_week, max_week)) AS week_number
+        FROM week_bounds
+    )
+
     SELECT
-        CONCAT(code_module, '_', code_presentation) AS course_id,
-        week_number AS week_id,
-        week_number,
+        CONCAT(c.code_module, '_', c.code_presentation) AS course_id,
+        w.week_number AS week_id,
+        w.week_number,
 
         CASE
-            WHEN week_number <= 10 THEN 1
-            WHEN week_number <= 20 THEN 2
+            WHEN w.week_number <= 10 THEN 1
+            WHEN w.week_number <= 20 THEN 2
             ELSE 3
         END AS phase_id
 
@@ -27,9 +40,7 @@ USING (
         FROM oulad.oulad_silver.courses_silver
     ) c
 
-    CROSS JOIN (
-        SELECT EXPLODE(SEQUENCE(1, 40)) AS week_number
-    ) w
+    CROSS JOIN generated_weeks w
 
 ) src
 
