@@ -4,8 +4,8 @@ CREATE TABLE IF NOT EXISTS oulad.oulad_silver.student_registration_silver (
     code_module STRING,
     code_presentation VARCHAR(50),
     id_student INT,
-    date_registration DATE,
-    date_unregistration DATE,
+    date_registration INT,
+    date_unregistration INT,
     ingestion_timestamp TIMESTAMP,
     ingestion_date DATE,
     PRIMARY KEY (code_module, code_presentation, id_student)
@@ -20,8 +20,8 @@ USING (
         UPPER(TRIM(code_module)) AS code_module,
         UPPER(TRIM(code_presentation)) AS code_presentation,
         id_student,
-        TRY_CAST(date_registration AS DATE) AS date_registration,
-        TRY_CAST(date_unregistration AS DATE) AS date_unregistration,
+        TRY_CAST(date_registration AS INT),
+        TRY_CAST(date_unregistration AS INT),
         ingestion_timestamp,
         CAST(ingestion_timestamp AS DATE) AS ingestion_date
     FROM (
