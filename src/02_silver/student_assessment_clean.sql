@@ -22,7 +22,7 @@ ALTER TABLE oulad.oulad_silver.student_assessment_silver DROP CONSTRAINT IF EXIS
 ALTER TABLE oulad.oulad_silver.student_assessment_silver ADD CONSTRAINT student_assessment_score_range
     CHECK (score IS NULL OR (NOT ISNAN(score) AND score BETWEEN 0 AND 100));
  
--- Covers both of your is_banked rules at once: NULL fails IN, so a missing status is refused by the same test as an invalid one.
+-- NULL fails IN, so a missing status is refused by the same test as an invalid one.
 ALTER TABLE oulad.oulad_silver.student_assessment_silver DROP CONSTRAINT IF EXISTS student_assessment_banked_domain;
 ALTER TABLE oulad.oulad_silver.student_assessment_silver ADD CONSTRAINT student_assessment_banked_domain
     CHECK (is_banked IN (0, 1));
