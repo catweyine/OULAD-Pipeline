@@ -10,7 +10,7 @@ SELECT
     -- normalize so courses with more students don't dominate
     -- the shape of the curve
     ROUND(SUM(total_clicks) * 1.0 / NULLIF(SUM(active_students), 0), 2) AS avg_clicks_per_active_student
-FROM oulad.oulad_gold.analysis_activity_trends
+FROM oulad.oulad_gold.fact_student_engagement
 GROUP BY week_number
 ORDER BY week_number;
 
@@ -21,7 +21,7 @@ SELECT
     week_number,
     SUM(total_clicks)     AS total_clicks,
     SUM(active_students)  AS active_students
-FROM oulad.oulad_gold.analysis_activity_trends
+FROM oulad.oulad_gold.fact_student_engagement
 GROUP BY code_module, code_presentation, week_number
 ORDER BY code_module, code_presentation, week_number;
 
@@ -31,7 +31,7 @@ WITH weekly AS (
     SELECT
         week_number,
         SUM(total_clicks) AS total_clicks
-    FROM oulad.oulad_gold.analysis_activity_trends
+    FROM oulad.oulad_gold.fact_student_engagement
     GROUP BY week_number
 )
 SELECT
@@ -51,7 +51,7 @@ SELECT
     week_number,
     activity_type,
     SUM(total_clicks) AS total_clicks
-FROM oulad.oulad_gold.analysis_activity_trends
+FROM oulad.oulad_gold.fact_student_engagement
 GROUP BY week_number, activity_type
 ORDER BY week_number, total_clicks DESC;
 
@@ -67,5 +67,5 @@ SELECT
         SUM(CASE WHEN week_number > 4 THEN click_count ELSE 0 END) * 1.0
         / NULLIF(SUM(CASE WHEN week_number <= 4 THEN click_count ELSE 0 END), 0), 2
     ) AS late_to_early_ratio
-FROM oulad.oulad_gold.fact_student_vle_engagement
+FROM oulad.oulad_gold.fact_student_engagement
 GROUP BY id_student, code_module, code_presentation;
