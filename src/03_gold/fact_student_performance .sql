@@ -3,11 +3,11 @@ USING DELTA
 AS
 SELECT
     XXHASH64(sp.id_student, sp.id_assessment) AS student_performance_key,
-    se.student_enrollment_id,          -- CHANGED: was ds.student_id / dim_student
+    se.student_enrollment_id,          
     da.assessment_key,
     dc.course_id,
     dcw.week_id,
-    da.assessment_day_offset AS assessment_date,   -- RE-ADDED, was dropped in this version
+    da.assessment_day_offset AS assessment_date,   
     sp.date_submitted AS submission_day_offset,
     sp.is_banked,
     sp.score,
@@ -34,10 +34,10 @@ INNER JOIN oulad.oulad_gold.dim_course AS dc
     ON  a.code_module = dc.code_module
     AND a.code_presentation = dc.code_presentation
 
-LEFT JOIN oulad.oulad_gold.dim_student_enrollment AS se   -- CHANGED: was INNER JOIN dim_student
+LEFT JOIN oulad.oulad_gold.dim_student_enrollment AS se   
     ON  sp.id_student = se.student_id
     AND dc.course_id  = se.course_id
 
 LEFT JOIN oulad.oulad_gold.dim_course_week AS dcw
     ON  dcw.course_id = dc.course_id
-    AND dcw.week_id  = FLOOR(sp.date_submitted / 7.0) + 1;   -- CHANGED: was the CEIL/FLOOR CASE
+    AND dcw.week_id  = CASE WHEN sp.date_submitted >=0 THEN CEIL(sp.date_submitted / 7.0) ELSE floor(sp.date_submitted / 7.0) end; 

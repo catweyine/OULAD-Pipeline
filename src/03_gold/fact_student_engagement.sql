@@ -25,7 +25,7 @@ LEFT JOIN oulad.oulad_gold.dim_vle AS dv
 
 LEFT JOIN oulad.oulad_gold.dim_course_week AS dcw
     ON dc.course_id = dcw.course_id
-   AND dcw.week_id  = FLOOR(sv.date/7.0)+1 
+   AND dcw.week_id  = CASE WHEN sv.date>=0 THEN ceil(sv.date/7.0) ELSE FLOOR(sv.date/7.0) END 
 
 GROUP BY
     se.student_enrollment_id,

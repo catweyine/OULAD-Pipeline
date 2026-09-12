@@ -1,13 +1,13 @@
 -- Grain: 1 row per student per module presentation
 CREATE TABLE IF NOT EXISTS oulad.oulad_gold.dim_student_enrollment (
-    student_enrollment_id STRING,           -- CHANGED: was INT from ABS(HASH(...))
+    student_enrollment_id STRING,           -- 
     student_id            INT,
     course_id             VARCHAR(100),
     num_of_prev_attempts  INT,
     studied_credits       INT,
     final_result          VARCHAR(50),
     date_registration     INT,              -- days from presentation start; can be negative
-    date_unregistration   INT,              -- ADDED. NULL = did not withdraw.
+    date_unregistration   INT,              -- NULL = did not withdraw.
     ingestion_timestamp   TIMESTAMP
 )
 USING DELTA;
@@ -15,9 +15,7 @@ USING DELTA;
 MERGE INTO oulad.oulad_gold.dim_student_enrollment AS target
 USING (
     SELECT
-        -- CHANGED: was ABS(HASH(...)). Spark's HASH is 32-bit and ABS halves it
-        -- again; across ~32,600 enrollments that carries a real chance of two
-        -- rows sharing an id, which this MERGE would resolve by overwriting one.
+        
         CONCAT(si.id_student, '_',
                UPPER(TRIM(si.code_module)), '_',
                UPPER(TRIM(si.code_presentation)))        AS student_enrollment_id,
@@ -27,13 +25,9 @@ USING (
         CAST(si.num_of_prev_attempts AS INT)             AS num_of_prev_attempts,
         CAST(si.studied_credits AS INT)                  AS studied_credits,
         TRIM(si.final_result)                            AS final_result,
-        -- CHANGED: was UNIX_DATE(sr.date_registration). UNIX_DATE expects a
-        -- DATE and returns days since 1970-01-01; date_registration is already
-        -- an INT day-offset from the module start, so there was nothing to
-        -- convert.
+
         CAST(sr.date_registration AS INT)                AS date_registration,
-        -- ADDED. Keeps its NULL: a NULL here means the student did not
-        -- withdraw, which is information. Nothing imputes a value for it.
+
         CAST(sr.date_unregistration AS INT)              AS date_unregistration,
         GREATEST(si.ingestion_timestamp, sr.ingestion_timestamp) AS ingestion_timestamp
     FROM (
@@ -73,13 +67,13 @@ WHEN MATCHED THEN
         target.studied_credits      = source.studied_credits,
         target.final_result         = source.final_result,
         target.date_registration    = source.date_registration,
-        target.date_unregistration  = source.date_unregistration,   -- ADDED
+        target.date_unregistration  = source.date_unregistration,   
         target.ingestion_timestamp  = source.ingestion_timestamp
 WHEN NOT MATCHED THEN
     INSERT (
         student_enrollment_id, student_id, course_id,
         num_of_prev_attempts, studied_credits, final_result,
-        date_registration, date_unregistration, ingestion_timestamp   -- ADDED
+        date_registration, date_unregistration, ingestion_timestamp   
     )
     VALUES (
         source.student_enrollment_id, source.student_id, source.course_id,
