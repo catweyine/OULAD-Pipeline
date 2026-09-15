@@ -10,13 +10,13 @@ MERGE INTO oulad.oulad_gold.dim_course_week AS tgt
 USING (
 
     SELECT
-        CONCAT(code_module, '_', code_presentation) AS course_id,
-        week_number AS week_id,
-        week_number,
+        CONCAT(c.code_module, '_', c.code_presentation) AS course_id,
+        w.week_number AS week_id,
+        w.week_number,
 
         CASE
-            WHEN week_number <= 10 THEN 1
-            WHEN week_number <= 20 THEN 2
+            WHEN w.week_number <= 10 THEN 1
+            WHEN w.week_number <= 20 THEN 2
             ELSE 3
         END AS phase_id
 
@@ -28,7 +28,7 @@ USING (
     ) c
 
     CROSS JOIN (
-        SELECT EXPLODE(SEQUENCE(1, 40)) AS week_number
+        SELECT EXPLODE(SEQUENCE(-25, 75)) AS week_number
     ) w
 
 ) src
